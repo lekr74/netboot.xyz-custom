@@ -1,9 +1,17 @@
 #!ipxe
 
-set base-url http://172.16.7.20/boot
+set base-url http://deb.debian.org/debian
+set release trixie
+set arch amd64
 
-imgfree
-kernel ${base-url}/vmlinuz vga=791 video=vesafb:ywrap,mtrr ramdisk_size=16777216 rw quiet splash
-initrd ${base-url}/initrd
-initrd ${base-url}/proxmox.iso /proxmox.iso
+set kernel ${base-url}/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}/linux
+set initrd ${base-url}/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}/initrd.gz
+
+echo Chargement du preseed pour MAC : ${mac:hexhyp}
+kernel ${kernel} auto=true priority=critical interface=auto \
+  netcfg/dhcp_timeout=60 netcfg/disable_dhcp=false \
+  preseed/url=http://23.138.204.160/preseed/${mac:hexhyp}.cfg \
+  hostname=earl-012 domain=mistral
+
+initrd ${initrd}
 boot
